@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Image Annotator</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js" integrity="sha512-CeIsOAsgJnmevfCi2C7Zsyy6bQKi43utIjdA87Q0ZY84oDqnI0uwfM9+bKiIkI75lUeI00WG/+uJzOmuHlesMA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f9;
+                color: #333;
+            }
+    
+            h1 {
+                text-align: center;
+                margin: 20px 0;
+                color: #444;
+            }
+    
+            h2 {
+                margin-top: 30px;
+                margin-left: 250PX;
+                color: #555;
+            }
+    
+            form, ul, div {
+                margin: 20px auto;
+                width: 90%;
+                max-width: 800px;
+            }
+    
+            input[type="file"], input[type="text"] {
+                display: block;
+                margin: 10px 0;
+                padding: 10px;
+                font-size: 16px;
+                width: calc(100% - 22px);
+                box-sizing: border-box;
+            }
+    
+            button {
+                padding: 10px 20px;
+                margin: 5px;
+                font-size: 16px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                background-color: #007BFF;
+                color: white;
+                transition: background-color 0.3s ease;
+            }
+    
+            button:hover {
+                background-color: #0056b3;
+            }
+    
+            #imageList button {
+                background-color: #6c757d;
+            }
+    
+            #imageList button:hover {
+                background-color: #5a6268;
+            }
+    
+            #classSelector, select {
+                width: 41%;
+                padding: 10px;
+                font-size: 16px;
+                margin-top: 10px;
+                margin-left: 550px;
+            }
+    
+            canvas {
+                display: block;
+                margin: 20px auto;
+                border: 1px solid #ccc;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+    
+            hr {
+                margin: 40px 0;
+                border: none;
+                border-top: 2px solid #eee;
+            }
+    
+            ul {
+                list-style: none;
+                padding: 0;
+            }
+    
+            ul li {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #ddd;
+            }
+
+            #saveLabels {
+                margin-top: 25px;
+                margin-left: 550px;
+            }
+        </style>
+</head>
+<body>
+    <h1>Welcome to Image Annotator</h1>
+    <form id="uploadFormDirect" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required onchange="uploadAndLoadImage(event)">
+    </form>
+    <hr>
+    <h2>Uploaded Images</h2>
+    <ul id="imageList">
+        {% for image in images %}
+            <li>
+                <button onclick="loadImage('{{ image }}')">{{ image }}</button>
+                <button onclick="deleteImage('{{ image }}')">Delete</button>
+            </li>
+        {% endfor %}
+    </ul>
+    <hr>
+    <h2>Classes</h2>
+    <div>
+        <label for="newClass">Add New Class:</label>
+        <input type="text" id="newClass" placeholder="Enter class name">
+        <button onclick="addClass()">Add Class</button>
+        <button onclick="deleteSelectedClass()">Delete Selected Class</button>
+        
+        
+    </div>
+    <select id="classSelector">
+        {% for cls in classes %}
+            <option value="{{ cls }}">{{ cls }}</option>
+        {% endfor %}
+    </select>
+    <hr>
+    <h2>Annotate Image</h2>
+    <div>
+        <canvas id="canvas" width="800" height="600" style="border:1px solid #000;"></canvas>
+    </div>
+    <button id="saveLabels">Save Labels</button>
+    <script>
+        const canvas = new fabric.Canvas('canvas');
+        let currentImage = null;
+
+        async function uploadAndLoadImage(event) {
+            const formData = new FormData();
+            formData.append('image', event.target.files[0]);
+
+            const response = await fetch('/upload_direct', { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.filename) {
+                const imageList = document.getElementById('imageList');
+                const newImage = document.createElement('li');
+                newImage.innerHTML = `<button onclick="loadImage('${result.filename}')">${result.filename}</button>
+                                      <button onclick="deleteImage('${result.filename}')">Delete</button>`;
+                imageList.appendChild(newImage);
+                loadImage(result.filename);
+            }
+        }
+
+        async function loadImage(imageName) {
+            try {
+                const imageUrl = `/images/${imageName}`;
+                console.log(`Loading image from: ${imageUrl}`); // Depuración
+
+                fabric.Image.fromURL(imageUrl, function (img) {
+                    canvas.clear(); // Limpiar el lienzo antes de cargar la nueva imagen
+                    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                        scaleX: canvas.width / img.width,
+                        scaleY: canvas.height / img.height,
+                        originX: 'left',
+                        originY: 'top',
+                    });
+                    currentImage = imageName; // Actualizar la imagen cargada actualmente
+                });
+            } catch (error) {
+                console.error("Error loading image:", error);
+                alert("Error: Could not load the image.");
+            }
+        }
+
+        async function addClass() {
+            const newClass = document.getElementById('newClass').value.trim();
+            if (!newClass) {
+                alert('Class name cannot be empty.');
+                return;
+            }
+
+            const response = await fetch('/add_class', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class: newClass })
+            });
+            const result = await response.json();
+
+            if (result.message) {
+                alert(result.message);
+                if (result.classes) {
+                    updateClassSelector(result.classes);
+                }
+            } else if (result.error) {
+                alert(result.error);
+            }
+        }
+
+        function updateClassSelector(classes) {
+            const classSelector = document.getElementById('classSelector');
+            classSelector.innerHTML = '';
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls;
+                option.text = cls;
+                classSelector.appendChild(option);
+            });
+        }
+
+        async function deleteImage(imageName) {
+            const response = await fetch(`/delete_image/${imageName}`, { method: 'DELETE' });
+            const result = await response.json();
+            alert(result.message);
+            if (!result.error) {
+                const imageList = document.getElementById('imageList');
+                const items = imageList.getElementsByTagName('li');
+                for (let item of items) {
+                    if (item.innerText.includes(imageName)) {
+                        imageList.removeChild(item);
+                        break;
+                    }
+                }
+                if (currentImage === imageName) {
+                    canvas.clear();
+                    currentImage = null;
+                }
+            }
+        }
+
+        canvas.on('mouse:down', function(options) {
+            if (options.target) return; // Avoid drawing over existing objects
+            const pointer = canvas.getPointer(options.e);
+
+            const selectedClass = document.getElementById('classSelector').value;
+            if (!selectedClass) {
+                alert('Please select a class before drawing.');
+                return;
+            }
+
+            const color = getColorForClass(selectedClass);
+            const rect = new fabric.Rect({
+                left: pointer.x,
+                top: pointer.y,
+                width: 100,
+                height: 100,
+                fill: color,
+                stroke: color,
+                strokeWidth: 2,
+                class: selectedClass, // Asociar la clase al bounding box
+            });
+
+            canvas.add(rect);
+        });
+
+        document.getElementById('saveLabels').addEventListener('click', async () => {
+            const labels = canvas.getObjects().map(obj => {
+                return {
+                    class: obj.class,
+                    x_center: (obj.left + obj.width / 2) / canvas.width,
+                    y_center: (obj.top + obj.height / 2) / canvas.height,
+                    width: obj.width / canvas.width,
+                    height: obj.height / canvas.height
+                };
+            });
+
+            const response = await fetch('/save_labels', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: currentImage, labels })
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        const colors = {}; // Para almacenar los colores únicos de cada clase
+
+        function getColorForClass(className) {
+            if (!colors[className]) {
+                // Generar color aleatorio
+                const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                
+                // Convertir HEX a RGBA con opacidad ajustada
+                const bigint = parseInt(randomColor.slice(1), 16);
+                const r = (bigint >> 16) & 255;
+                const g = (bigint >> 8) & 255;
+                const b = bigint & 255;
+                
+                // Guardar el color con opacidad en RGBA
+                colors[className] = `rgba(${r}, ${g}, ${b}, 0.5)`; // Opacidad al 50%
+            }
+            return colors[className];
+        }
+        
+
+        async function deleteSelectedClass() {
+            const classSelector = document.getElementById('classSelector');
+            const selectedClass = classSelector.value;
+        
+            if (!selectedClass) {
+                alert('Please select a class to delete.');
+                return;
+            }
+        
+            const response = await fetch('/delete_class', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class: selectedClass })
+            });
+            const result = await response.json();
+        
+            if (result.message) {
+                alert(result.message);
+                if (result.classes) {
+                    updateClassSelector(result.classes);
+                }
+            } else if (result.error) {
+                alert(result.error);
+            }
+        }
+        
+    </script>
+</body>
+</html>
