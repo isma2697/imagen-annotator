@@ -1,0 +1,35 @@
+{
+    "images": [
+        {
+            "id": "59-es-l-golden-running-thinking-getting-dog-beneficios.png",
+            "file_name": "59-es-l-golden-running-thinking-getting-dog-beneficios.png",
+            "width": 800,
+            "height": 600
+        }
+    ],
+    "annotations": [
+        {
+            "id": 0,
+            "image_id": "59-es-l-golden-running-thinking-getting-dog-beneficios.png",
+            "category_id": 0,
+            "bbox": [
+                220.79177057356605,
+                194.66362126245846,
+                100.0,
+                100.0
+            ],
+            "area": 9999.999999999998,
+            "iscrowd": 0
+        }
+    ],
+    "categories": [
+        {
+            "id": 0,
+            "name": "rabbit"
+        },
+        {
+            "id": 1,
+            "name": "dog"
+        }
+    ]
+}

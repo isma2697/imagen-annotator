@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<annotation>
+   <folder>images</folder>
+   <filename>IMG20250121152506.jpg</filename>
+   <size>
+      <width>800</width>
+      <height>600</height>
+      <depth>3</depth>
+   </size>
+   <object>
+      <name>rabbit</name>
+      <bndbox>
+         <xmin>312</xmin>
+         <ymin>214</ymin>
+         <xmax>412</xmax>
+         <ymax>314</ymax>
+      </bndbox>
+   </object>
+   <object>
+      <name>rabbit</name>
+      <bndbox>
+         <xmin>591</xmin>
+         <ymin>217</ymin>
+         <xmax>691</xmax>
+         <ymax>317</ymax>
+      </bndbox>
+   </object>
+</annotation>

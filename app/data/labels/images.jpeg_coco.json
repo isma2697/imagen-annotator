@@ -1,0 +1,74 @@
+{
+    "images": [
+        {
+            "id": "images.jpeg",
+            "file_name": "images.jpeg",
+            "width": 800,
+            "height": 600
+        }
+    ],
+    "annotations": [
+        {
+            "id": 0,
+            "image_id": "images.jpeg",
+            "category_id": 0,
+            "bbox": [
+                477.15087281795513,
+                379.0490033222591,
+                100.0,
+                100.0
+            ],
+            "area": 9999.999999999998,
+            "iscrowd": 0
+        },
+        {
+            "id": 1,
+            "image_id": "images.jpeg",
+            "category_id": 0,
+            "bbox": [
+                426.2780548628429,
+                242.50415282392026,
+                100.0,
+                100.0
+            ],
+            "area": 9999.999999999998,
+            "iscrowd": 0
+        },
+        {
+            "id": 2,
+            "image_id": "images.jpeg",
+            "category_id": 0,
+            "bbox": [
+                307.57481296758107,
+                319.2483388704319,
+                100.0,
+                100.0
+            ],
+            "area": 9999.999999999998,
+            "iscrowd": 0
+        },
+        {
+            "id": 3,
+            "image_id": "images.jpeg",
+            "category_id": 0,
+            "bbox": [
+                263.6845386533666,
+                190.6769102990033,
+                100.0,
+                100.0
+            ],
+            "area": 9999.999999999998,
+            "iscrowd": 0
+        }
+    ],
+    "categories": [
+        {
+            "id": 0,
+            "name": "rabbit"
+        },
+        {
+            "id": 1,
+            "name": "dog"
+        }
+    ]
+}

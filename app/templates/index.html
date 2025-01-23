@@ -1,146 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Image Annotator</title>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js" integrity="sha512-CeIsOAsgJnmevfCi2C7Zsyy6bQKi43utIjdA87Q0ZY84oDqnI0uwfM9+bKiIkI75lUeI00WG/+uJzOmuHlesMA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f4f4f9;
-                color: #333;
-            }
-    
-            h1 {
-                text-align: center;
-                margin: 20px 0;
-                color: #444;
-            }
-    
-            h2 {
-                margin-top: 30px;
-                margin-left: 250PX;
-                color: #555;
-            }
-    
-            form, ul, div {
-                margin: 20px auto;
-                width: 90%;
-                max-width: 800px;
-            }
-    
-            input[type="file"], input[type="text"] {
-                display: block;
-                margin: 10px 0;
-                padding: 10px;
-                font-size: 16px;
-                width: calc(100% - 22px);
-                box-sizing: border-box;
-            }
-    
-            button {
-                padding: 10px 20px;
-                margin: 5px;
-                font-size: 16px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                background-color: #007BFF;
-                color: white;
-                transition: background-color 0.3s ease;
-            }
-    
-            button:hover {
-                background-color: #0056b3;
-            }
-    
-            #imageList button {
-                background-color: #6c757d;
-            }
-    
-            #imageList button:hover {
-                background-color: #5a6268;
-            }
-    
-            #classSelector, select {
-                width: 41%;
-                padding: 10px;
-                font-size: 16px;
-                margin-top: 10px;
-                margin-left: 550px;
-            }
-    
-            canvas {
-                display: block;
-                margin: 20px auto;
-                border: 1px solid #ccc;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-    
-            hr {
-                margin: 40px 0;
-                border: none;
-                border-top: 2px solid #eee;
-            }
-    
-            ul {
-                list-style: none;
-                padding: 0;
-            }
-    
-            ul li {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 0;
-                border-bottom: 1px solid #ddd;
-            }
 
-            #saveLabels {
-                margin-top: 25px;
-                margin-left: 550px;
-            }
-        </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Image Annotator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"
+        integrity="sha512-CeIsOAsgJnmevfCi2C7Zsyy6bQKi43utIjdA87Q0ZY84oDqnI0uwfM9+bKiIkI75lUeI00WG/+uJzOmuHlesMA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 </head>
+
 <body>
-    <h1>Welcome to Image Annotator</h1>
-    <form id="uploadFormDirect" method="post" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/*" required onchange="uploadAndLoadImage(event)">
-    </form>
-    <hr>
-    <h2>Uploaded Images</h2>
-    <ul id="imageList">
-        {% for image in images %}
-            <li>
-                <button onclick="loadImage('{{ image }}')">{{ image }}</button>
-                <button onclick="deleteImage('{{ image }}')">Delete</button>
-            </li>
-        {% endfor %}
-    </ul>
-    <hr>
-    <h2>Classes</h2>
-    <div>
-        <label for="newClass">Add New Class:</label>
-        <input type="text" id="newClass" placeholder="Enter class name">
-        <button onclick="addClass()">Add Class</button>
-        <button onclick="deleteSelectedClass()">Delete Selected Class</button>
-        
-        
+    <div class="title1">
+        <h1>Welcome to Image Annotator</h1>
     </div>
-    <select id="classSelector">
-        {% for cls in classes %}
-            <option value="{{ cls }}">{{ cls }}</option>
-        {% endfor %}
-    </select>
-    <hr>
-    <h2>Annotate Image</h2>
-    <div>
-        <canvas id="canvas" width="800" height="600" style="border:1px solid #000;"></canvas>
+    <div class="container">
+        <div class="block1">
+            <h2>Uploaded Images</h2>
+            <form id="uploadFormDirect" method="post" enctype="multipart/form-data">
+                <label for="fileInput" class="custom-file-label">Choose File</label>
+                <input type="file" id="fileInput" name="image" accept="image/*" required
+                    onchange="uploadAndLoadImage(event)">
+            </form>
+            <ul id="imageList">
+                {% for image in images %}
+                <li>
+                    <button onclick="loadImage('{{ image }}')">{{ image }}</button>
+                    <button onclick="deleteImage('{{ image }}')">Delete</button>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="column">
+            <div class="block2">
+                <h2>Classes</h2>
+                <div>
+                    <label for="newClass">Add New Class:</label>
+                    <input type="text" id="newClass" placeholder="Enter class name">
+                    <button onclick="addClass()">Add Class</button>
+                    <button onclick="deleteSelectedClass()">Delete Selected Class</button>
+                </div>
+                <select id="classSelector">
+                    {% for cls in classes %}
+                    <option value="{{ cls }}">{{ cls }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="block3">
+                <h2>Annotate Image</h2>
+                <div class="canvas-container">
+                    <canvas id="canvas" width="800" height="600" style="border:1px solid #000;"></canvas>
+                </div>
+                <label for="formatSelector">Select Format:</label>
+                <select id="formatSelector">
+                    <option value="yolo">YOLO</option>
+                    <option value="coco">COCO</option>
+                    <option value="pascal_voc">Pascal VOC</option>
+                </select>
+                <button id="saveLabels">Save Labels</button>
+            </div>
+        </div>
+        <div class="block4">
+            <h2>Existing Labels</h2>
+            <ul id="labelList">
+            </ul>
+        </div>
     </div>
-    <button id="saveLabels">Save Labels</button>
+
     <script>
         const canvas = new fabric.Canvas('canvas');
         let currentImage = null;
@@ -179,14 +107,14 @@
                 });
             } catch (error) {
                 console.error("Error loading image:", error);
-                alert("Error: Could not load the image.");
+                //alert("Error: Could not load the image.");
             }
         }
 
         async function addClass() {
             const newClass = document.getElementById('newClass').value.trim();
             if (!newClass) {
-                alert('Class name cannot be empty.');
+                //alert('Class name cannot be empty.');
                 return;
             }
 
@@ -198,12 +126,12 @@
             const result = await response.json();
 
             if (result.message) {
-                alert(result.message);
+                //alert(result.message);
                 if (result.classes) {
                     updateClassSelector(result.classes);
                 }
             } else if (result.error) {
-                alert(result.error);
+                //alert(result.error);
             }
         }
 
@@ -221,7 +149,7 @@
         async function deleteImage(imageName) {
             const response = await fetch(`/delete_image/${imageName}`, { method: 'DELETE' });
             const result = await response.json();
-            alert(result.message);
+            //alert(result.message);
             if (!result.error) {
                 const imageList = document.getElementById('imageList');
                 const items = imageList.getElementsByTagName('li');
@@ -238,13 +166,13 @@
             }
         }
 
-        canvas.on('mouse:down', function(options) {
+        canvas.on('mouse:down', function (options) {
             if (options.target) return; // Avoid drawing over existing objects
             const pointer = canvas.getPointer(options.e);
 
             const selectedClass = document.getElementById('classSelector').value;
             if (!selectedClass) {
-                alert('Please select a class before drawing.');
+                //alert('Please select a class before drawing.');
                 return;
             }
 
@@ -264,6 +192,9 @@
         });
 
         document.getElementById('saveLabels').addEventListener('click', async () => {
+            const formatSelector = document.getElementById('formatSelector');
+            const selectedFormat = formatSelector.value; // Obtener el formato seleccionado
+        
             const labels = canvas.getObjects().map(obj => {
                 return {
                     class: obj.class,
@@ -273,62 +204,95 @@
                     height: obj.height / canvas.height
                 };
             });
-
+        
             const response = await fetch('/save_labels', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename: currentImage, labels })
+                body: JSON.stringify({
+                    filename: currentImage,
+                    labels,
+                    format: selectedFormat // Incluir el formato seleccionado
+                })
             });
+        
             const result = await response.json();
-            alert(result.message);
+            if (!result.error) {
+                loadLabelFiles(); // Actualizar la lista de archivos después de guardar
+            } else {
+                console.error('Failed to save labels:', result.error);
+            }
         });
 
-        const colors = {}; // Para almacenar los colores únicos de cada clase
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLabelFiles(); // Cargar archivos existentes al cargar la página
+        });
 
+        async function loadLabelFiles() {
+            const response = await fetch('/list_labels');
+            const result = await response.json();
+        
+            const labelContainer = document.getElementById('labelList');
+            labelContainer.innerHTML = ''; // Limpiar la lista anterior
+        
+            if (result.labels) {
+                result.labels.forEach(file => {
+                    const fileElement = document.createElement('li');
+                    fileElement.textContent = file; // Mostrar el nombre del archivo
+                    labelContainer.appendChild(fileElement);
+                });
+            } else if (result.error) {
+                labelContainer.innerHTML = `<li>Error: ${result.error}</li>`;
+            } else {
+                labelContainer.innerHTML = '<li>No label files found.</li>';
+            }
+        }
+        
+        const colors = {}; // Para almacenar los colores únicos de cada clase
         function getColorForClass(className) {
             if (!colors[className]) {
                 // Generar color aleatorio
                 const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                
+
                 // Convertir HEX a RGBA con opacidad ajustada
                 const bigint = parseInt(randomColor.slice(1), 16);
                 const r = (bigint >> 16) & 255;
                 const g = (bigint >> 8) & 255;
                 const b = bigint & 255;
-                
+
                 // Guardar el color con opacidad en RGBA
                 colors[className] = `rgba(${r}, ${g}, ${b}, 0.5)`; // Opacidad al 50%
             }
             return colors[className];
         }
-        
+
 
         async function deleteSelectedClass() {
             const classSelector = document.getElementById('classSelector');
             const selectedClass = classSelector.value;
-        
+
             if (!selectedClass) {
-                alert('Please select a class to delete.');
+                //alert('Please select a class to delete.');
                 return;
             }
-        
+
             const response = await fetch('/delete_class', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ class: selectedClass })
             });
             const result = await response.json();
-        
+
             if (result.message) {
-                alert(result.message);
+                //alert(result.message);
                 if (result.classes) {
                     updateClassSelector(result.classes);
                 }
             } else if (result.error) {
-                alert(result.error);
+                //alert(result.error);
             }
         }
-        
+
     </script>
 </body>
+
 </html>
